@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 ภารกิจกู้ภัยอวกาศ: Space Rescue Mission</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #09090b 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Starry background effect */
+        .stars {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 50px 160px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 90px 40px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 130px 80px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 160px 120px, #ffffff, rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            animation: twinkle 4s infinite alternate;
+            opacity: 0.6;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.8; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .shake { animation: shake 0.4s ease-in-out; }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(139, 92, 246, 0.1);
+        }
+
+        .selectable-card {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .selectable-card:hover { transform: translateY(-2px); border-color: rgba(139, 92, 246, 0.5); }
+        .selectable-card.selected {
+            background-color: rgba(99, 102, 241, 0.3);
+            border-color: #8b5cf6;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+        }
+
+        .primary-btn {
+            background: linear-gradient(to right, #6366f1, #a855f7);
+            transition: all 0.2s ease;
+        }
+        .primary-btn:hover {
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+            transform: scale(1.02);
+        }
+        .primary-btn:active { transform: scale(0.98); }
+
+        .floating { animation: float 3s ease-in-out infinite; }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center p-4 sm:p-6">
+
+    <div class="stars"></div>
+
+    <div id="app-container" class="glass-card w-full max-w-lg rounded-3xl p-5 sm:p-8 relative z-10 flex flex-col min-h-[550px]">
+        
+        <!-- Header & Progress -->
+        <div class="text-center mb-6">
+            <h1 class="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-4">
+                🚀 ภารกิจกู้ภัยอวกาศ
+            </h1>
+            
+            <div class="flex justify-between items-center text-sm font-semibold mb-2 px-1">
+                <span class="text-indigo-300">พลังงานยานอวกาศ (CT Power)</span>
+                <span id="progress-text" class="text-emerald-400">0%</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-3 border border-slate-700 overflow-hidden">
+                <div id="progress-bar" class="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 h-3 rounded-full transition-all duration-700 ease-out" style="width: 0%"></div>
+            </div>
+            <div id="stage-indicator" class="text-xs text-slate-400 mt-2 font-medium tracking-wider">STAGE 1 / 5</div>
+        </div>
+
+        <!-- Dynamic Stage Content -->
+        <div id="stage-content" class="flex-1 flex flex-col justify-center items-center w-full">
+            <!-- Content gets injected here by JS -->
+        </div>
+
+    </div>
+
+    <!-- Educational Modal Overlay -->
+    <div id="modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex-col items-center justify-center p-4 transition-opacity">
+        <div class="glass-card w-full max-w-sm rounded-2xl p-6 text-center transform scale-95 transition-transform" id="modal-content">
+            <div id="modal-icon" class="text-5xl mb-4 floating">💡</div>
+            <h2 id="modal-title" class="text-xl font-bold text-emerald-400 mb-2">ยอดเยี่ยม!</h2>
+            <div class="bg-slate-900/50 p-4 rounded-xl border border-indigo-500/30 mb-5">
+                <p id="modal-desc" class="text-sm text-slate-200 leading-relaxed font-medium"></p>
+            </div>
+            <button id="modal-btn" class="primary-btn w-full py-3 rounded-xl font-bold text-white shadow-lg">
+                ทำภารกิจต่อไป 🚀
+            </button>
+        </div>
+    </div>
+
+    <!-- Error Toast (Alternative to alert) -->
+    <div id="toast" class="fixed bottom-10 bg-rose-600 text-white px-6 py-3 rounded-full font-semibold shadow-[0_0_20px_rgba(225,29,72,0.5)] transform translate-y-24 opacity-0 transition-all duration-300 z-50">
+        ข้อความแจ้งเตือน
+    </div>
+
+    <script>
+        // Game State
+        let currentStage = 1;
+        let progress = 0;
+        
+        // DOM Elements
+        const stageContent = document.getElementById('stage-content');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const stageIndicator = document.getElementById('stage-indicator');
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalDesc = document.getElementById('modal-desc');
+        const modalBtn = document.getElementById('modal-btn');
+        const toast = document.getElementById('toast');
+
+        // Education Content for Modals
+        const eduData = {
+            1: { title: "Decomposition", desc: "การแบ่งย่อยปัญหา: แบ่งปัญหาใหญ่ (ยานเสีย) เป็นปัญหาย่อย (ซ่อมทีละจุด) ทำให้แก้ปัญหาได้ง่ายขึ้น!", icon: "🧩" },
+            2: { title: "Abstraction", desc: "การคิดเชิงนามธรรม: คัดกรองเอาเฉพาะข้อมูลที่จำเป็น (พิกัด, SOS) และตัดรายละเอียดที่ไม่จำเป็น (ขยะอวกาศ) ทิ้งไป!", icon: "🔍" },
+            3: { title: "Pattern Recognition", desc: "การหารูปแบบ: สังเกตลักษณะที่เหมือนกัน (เอเลี่ยนตาเดียว) เพื่อจัดกลุ่มและแก้ปัญหาอย่างเป็นระบบ!", icon: "👽" },
+            4: { title: "Algorithm Design", desc: "การออกแบบขั้นตอน: วางแผนลำดับการทำงานทีละขั้นอย่างชัดเจนและถูกต้องตามความเป็นจริง!", icon: "📋" },
+            5: { title: "Debugging", desc: "การแก้ไขจุดบกพร่อง: ตรวจหาข้อผิดพลาดในลำดับขั้นตอน และแก้ไขให้โค้ดทำงานได้ถูกต้อง!", icon: "🐛" }
+        };
+
+        // Utility: Show Toast Message
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 2500);
+        }
+
+        // Utility: Show Modal
+        function showEduModal(stageNum) {
+            const data = eduData[stageNum];
+            document.getElementById('modal-icon').textContent = data.icon;
+            modalTitle.textContent = `${data.title} สำเร็จ!`;
+            modalDesc.textContent = data.desc;
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => { document.getElementById('modal-content').classList.replace('scale-95', 'scale-100'); }, 10);
+
+            modalBtn.onclick = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.getElementById('modal-content').classList.replace('scale-100', 'scale-95');
+                
+                progress += 20;
+                progressBar.style.width = `${progress}%`;
+                progressText.textContent = `${progress}%`;
+                
+                currentStage++;
+                if (currentStage > 5) {
+                    renderEndGame();
+                } else {
+                    renderStage();
+                }
+            };
+        }
+
+        function shakeElement(id) {
+            const el = document.getElementById(id);
+            if(el) {
+                el.classList.remove('shake');
+                void el.offsetWidth; // trigger reflow
+                el.classList.add('shake');
+            }
+        }
+
+        // Core Renderer
+        function renderStage() {
+            stageIndicator.textContent = `STAGE ${currentStage} / 5`;
+            stageContent.innerHTML = ''; // clear
+            stageContent.className = "flex-1 flex flex-col justify-center items-center w-full animate-[fadeIn_0.5s_ease-out]";
+
+            switch(currentStage) {
+                case 1: renderStage1(); break;
+                case 2: renderStage2(); break;
+                case 3: renderStage3(); break;
+                case 4: renderStage4(); break;
+                case 5: renderStage5(); break;
+            }
+        }
+
+        function renderStage1() {
+            let state = { engine: false, comms: false, wing: false };
+            
+            stageContent.innerHTML = `
+                <div class="text-center mb-6">
+                    <h2 class="text-xl font-bold text-cyan-300 mb-1">ด่านที่ 1: ซ่อมแซมยานอวกาศ</h2>
+                    <p class="text-sm text-slate-300">ยานอวกาศมีไฟไหม้! คลิกซ่อมแซมปัญหาย่อยทั้ง 3 จุด</p>
+                </div>
+                
+                <div class="relative w-48 h-48 flex items-center justify-center floating mb-6">
+                    <div class="text-9xl">🚀</div>
+                    
+                    <button id="btn-engine" class="absolute top-2 -left-4 bg-rose-600/90 hover:bg-rose-500 border-2 border-rose-400 p-2 rounded-full shadow-[0_0_15px_rgba(225,29,72,0.8)] transition-all transform hover:scale-110">
+                        ⚙️🔥
+                    </button>
+                    <button id="btn-comms" class="absolute top-10 -right-4 bg-rose-600/90 hover:bg-rose-500 border-2 border-rose-400 p-2 rounded-full shadow-[0_0_15px_rgba(225,29,72,0.8)] transition-all transform hover:scale-110">
+                        📡🔥
+                    </button>
+                    <button id="btn-wing" class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-rose-600/90 hover:bg-rose-500 border-2 border-rose-400 p-2 rounded-full shadow-[0_0_15px_rgba(225,29,72,0.8)] transition-all transform hover:scale-110">
+                        ✈️🔥
+                    </button>
+                </div>
+                <div class="h-8 flex gap-2" id="s1-indicators"></div>
+            `;
+
+            const checkComplete = () => {
+                if(state.engine && state.comms && state.wing) {
+                    setTimeout(() => showEduModal(1), 500);
+                }
+            };
+
+            const markFixed = (id, key, icon) => {
+                const btn = document.getElementById(id);
+                if(state[key]) return;
+                state[key] = true;
+                btn.className = "absolute bg-emerald-500 border-2 border-emerald-300 p-2 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.8)] transition-all scale-110";
+                btn.innerHTML = `${icon}✅`;
+                btn.style.top = btn.style.top; // retain position
+                checkComplete();
+            };
+
+            document.getElementById('btn-engine').onclick = () => markFixed('btn-engine', 'engine', '⚙️');
+            document.getElementById('btn-comms').onclick = () => markFixed('btn-comms', 'comms', '📡');
+            document.getElementById('btn-wing').onclick = () => markFixed('btn-wing', 'wing', '✈️');
+        }
+
+        function renderStage2() {
+            const cards = [
+                { id: 'c1', text: "📍 พิกัดดาว", isTarget: true },
+                { id: 'c2', text: "📺 โฆษณาอวกาศ", isTarget: false },
+                { id: 'c3', text: "🎵 เพลงเอเลี่ยน", isTarget: false },
+                { id: 'c4', text: "🆘 โค้ด SOS", isTarget: true }
+            ];
+            let selected = new Set();
+
+            stageContent.innerHTML = `
+                <div class="text-center mb-6">
+                    <h2 class="text-xl font-bold text-cyan-300 mb-1">ด่านที่ 2: ค้นหาสัญญาณ SOS</h2>
+                    <p class="text-sm text-slate-300">เลือก <span class="text-purple-300 font-bold">เฉพาะข้อมูลที่จำเป็น</span> ต่อการช่วยเหลือเท่านั้น</p>
+                </div>
+                
+                <div id="s2-grid" class="grid grid-cols-2 gap-4 w-full max-w-sm mb-6">
+                    ${cards.map(c => `
+                        <div id="${c.id}" class="selectable-card bg-slate-800 p-4 rounded-xl text-center flex flex-col items-center justify-center min-h-[100px]">
+                            <span class="text-3xl mb-2">${c.text.split(' ')[0]}</span>
+                            <span class="font-medium text-sm">${c.text.split(' ')[1]}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <button id="s2-submit" class="primary-btn w-full max-w-sm py-3 rounded-xl font-bold text-lg shadow-lg">
+                    📡 ยืนยันข้อมูล
+                </button>
+            `;
+
+            cards.forEach(c => {
+                document.getElementById(c.id).onclick = (e) => {
+                    const el = e.currentTarget;
+                    if(selected.has(c.id)) {
+                        selected.delete(c.id);
+                        el.classList.remove('selected');
+                    } else {
+                        selected.add(c.id);
+                        el.classList.add('selected');
+                    }
+                };
+            });
+
+            document.getElementById('s2-submit').onclick = () => {
+                const targets = cards.filter(c => c.isTarget).map(c => c.id);
+                const isCorrect = selected.size === targets.length && targets.every(id => selected.has(id));
+                
+                if(isCorrect) {
+                    showEduModal(2);
+                } else {
+                    shakeElement('s2-grid');
+                    showToast("ยังไม่ถูกต้อง! ลองเลือกเฉพาะ พิกัดดาว และ โค้ด SOS ดูสิ");
+                }
+            };
+        }
+
+        function renderStage3() {
+            const cards = [
+                { id: 'a1', text: "ตาเดียว", icon: "👁️👽", isTarget: true },
+                { id: 'a2', text: "สามตา", icon: "👁️👁️👁️👽", isTarget: false },
+                { id: 'a3', text: "ตาเดียว", icon: "👁️👽", isTarget: true },
+                { id: 'a4', text: "สามตา", icon: "👁️👁️👁️👽", isTarget: false }
+            ];
+            let selected = new Set();
+
+            stageContent.innerHTML = `
+                <div class="text-center mb-6">
+                    <h2 class="text-xl font-bold text-cyan-300 mb-1">ด่านที่ 3: จัดกลุ่มเอเลี่ยนอพยพ</h2>
+                    <p class="text-sm text-slate-300">สังเกตรูปแบบ! เลือกเฉพาะเอเลี่ยน <span class="text-purple-300 font-bold">"ตาเดียว"</span> ขึ้นยาน</p>
+                </div>
+                
+                <div id="s3-grid" class="grid grid-cols-2 gap-4 w-full max-w-sm mb-6">
+                    ${cards.map(c => `
+                        <div id="${c.id}" class="selectable-card bg-slate-800 p-4 rounded-xl text-center flex flex-col items-center justify-center min-h-[100px]">
+                            <span class="text-4xl mb-2">${c.icon}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <button id="s3-submit" class="primary-btn w-full max-w-sm py-3 rounded-xl font-bold text-lg shadow-lg">
+                    🛸 นำขึ้นยานกู้ภัย
+                </button>
+            `;
+
+            cards.forEach(c => {
+                document.getElementById(c.id).onclick = (e) => {
+                    const el = e.currentTarget;
+                    if(selected.has(c.id)) {
+                        selected.delete(c.id);
+                        el.classList.remove('selected');
+                    } else {
+                        selected.add(c.id);
+                        el.classList.add('selected');
+                    }
+                };
+            });
+
+            document.getElementById('s3-submit').onclick = () => {
+                const targets = cards.filter(c => c.isTarget).map(c => c.id);
+                const isCorrect = selected.size === targets.length && targets.every(id => selected.has(id));
+                
+                if(isCorrect) {
+                    showEduModal(3);
+                } else {
+                    shakeElement('s3-grid');
+                    showToast("เอ๊ะ รูปแบบผิด! ต้องเลือกเอเลี่ยนที่มีตาเดียวทั้งหมดนะ");
+                }
+            };
+        }
+
+        function renderStage4() {
+            // Steps mapped to sequence 1,2,3,4
+            const steps = [
+                { seq: 3, text: "แตะพื้นดาว 🪐" },
+                { seq: 1, text: "กางล้อลงจอด 🛞" },
+                { seq: 4, text: "ดับเครื่องยนต์ 🛑" },
+                { seq: 2, text: "ลดความเร็ว ⏬" }
+            ];
+            let currentExpected = 1;
+
+            stageContent.innerHTML = `
+                <div class="text-center mb-6">
+                    <h2 class="text-xl font-bold text-cyan-300 mb-1">ด่านที่ 4: ลงจอดฉุกเฉิน</h2>
+                    <p class="text-sm text-slate-300">เรียงลำดับขั้นตอนการลงจอดให้ปลอดภัย (คลิกตามลำดับที่ถูกต้อง)</p>
+                </div>
+                
+                <div class="flex justify-center mb-4 text-xs font-mono text-purple-300" id="s4-status">
+                    รอรับคำสั่งลงจอด... ลำดับที่ 1
+                </div>
+
+                <div id="s4-list" class="flex flex-col gap-3 w-full max-w-sm">
+                    ${steps.map((s, i) => `
+                        <button id="s4-btn-${i}" class="step-btn bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-xl py-3 px-4 text-left font-medium flex items-center justify-between transition-all" data-seq="${s.seq}">
+                            <span>${s.text}</span>
+                            <span class="badge w-6 h-6 rounded-full bg-slate-900 flex items-center justify-center text-xs opacity-0 transition-opacity"></span>
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+
+            const resetSequence = () => {
+                currentExpected = 1;
+                document.getElementById('s4-status').textContent = `เกิดข้อผิดพลาด! ลำดับไม่ถูกต้อง เริ่มใหม่...`;
+                document.getElementById('s4-status').className = "flex justify-center mb-4 text-xs font-mono text-rose-400";
+                shakeElement('s4-list');
+                
+                document.querySelectorAll('.step-btn').forEach(btn => {
+                    btn.disabled = false;
+                    btn.className = "step-btn bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-xl py-3 px-4 text-left font-medium flex items-center justify-between transition-all";
+                    const badge = btn.querySelector('.badge');
+                    badge.classList.add('opacity-0');
+                    badge.classList.remove('bg-emerald-500');
+                    badge.textContent = '';
+                });
+
+                setTimeout(() => {
+                    document.getElementById('s4-status').textContent = `รอรับคำสั่งลงจอด... ลำดับที่ 1`;
+                    document.getElementById('s4-status').className = "flex justify-center mb-4 text-xs font-mono text-purple-300";
+                }, 2000);
+            };
+
+            document.querySelectorAll('.step-btn').forEach(btn => {
+                btn.onclick = (e) => {
+                    const el = e.currentTarget;
+                    const seq = parseInt(el.getAttribute('data-seq'));
+                    
+                    if(seq === currentExpected) {
+                        // Correct step
+                        el.disabled = true;
+                        el.classList.remove('bg-slate-800', 'hover:bg-slate-700', 'border-slate-600');
+                        el.classList.add('bg-indigo-900/60', 'border-indigo-400');
+                        
+                        const badge = el.querySelector('.badge');
+                        badge.textContent = currentExpected;
+                        badge.classList.remove('opacity-0', 'bg-slate-900');
+                        badge.classList.add('opacity-100', 'bg-indigo-500');
+
+                        currentExpected++;
+                        if(currentExpected > 4) {
+                            document.getElementById('s4-status').textContent = "ลำดับสมบูรณ์! กำลังลงจอด...";
+                            document.getElementById('s4-status').classList.replace('text-purple-300', 'text-emerald-400');
+                            setTimeout(() => showEduModal(4), 600);
+                        } else {
+                            document.getElementById('s4-status').textContent = `เยี่ยม! ต่อไปกดลำดับที่ ${currentExpected}`;
+                        }
+                    } else {
+                        // Wrong step
+                        resetSequence();
+                    }
+                };
+            });
+        }
+
+        function renderStage5() {
+            // Logic sequence: 1. Fingerprint, 2. Password, 3. Door
+            const bugs = [
+                { seq: 2, text: "ใส่รหัสผ่าน 🔢" },
+                { seq: 3, text: "เปิดประตู 🚪" },
+                { seq: 1, text: "ตรวจสอบลายนิ้วมือ 👆" }
+            ];
+            let currentExpected = 1;
+
+            stageContent.innerHTML = `
+                <div class="text-center mb-6">
+                    <h2 class="text-xl font-bold text-cyan-300 mb-1">ด่านที่ 5: ปลดล็อกประตูช่วยชีวิต</h2>
+                    <p class="text-sm text-slate-300">โค้ดมีบั๊ก (Bug) ทำงานผิดลำดับ! คลิกเรียงลำดับใหม่ให้ถูกต้อง</p>
+                </div>
+                
+                <div class="bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs font-mono p-2 rounded-lg mb-4 w-full max-w-sm text-center">
+                    ⚠️ Error: Sequence Execution Failed
+                </div>
+
+                <div id="s5-list" class="flex flex-col gap-3 w-full max-w-sm">
+                    ${bugs.map((b, i) => `
+                        <button class="bug-btn bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-xl py-3 px-4 text-left font-medium flex items-center justify-between transition-all" data-seq="${b.seq}">
+                            <span>${b.text}</span>
+                            <span class="badge w-6 h-6 rounded-full bg-slate-900 flex items-center justify-center text-xs opacity-0 transition-opacity"></span>
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+
+            const resetBugSequence = () => {
+                currentExpected = 1;
+                shakeElement('s5-list');
+                showToast("ลำดับการทำงานยังผิดอยู่ ลองคิดหลักความจริงดูนะ!");
+                
+                document.querySelectorAll('.bug-btn').forEach(btn => {
+                    btn.disabled = false;
+                    btn.className = "bug-btn bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-xl py-3 px-4 text-left font-medium flex items-center justify-between transition-all";
+                    const badge = btn.querySelector('.badge');
+                    badge.classList.add('opacity-0');
+                });
+            };
+
+            document.querySelectorAll('.bug-btn').forEach(btn => {
+                btn.onclick = (e) => {
+                    const el = e.currentTarget;
+                    const seq = parseInt(el.getAttribute('data-seq'));
+                    
+                    if(seq === currentExpected) {
+                        el.disabled = true;
+                        el.classList.remove('bg-slate-800', 'hover:bg-slate-700', 'border-slate-600');
+                        el.classList.add('bg-emerald-900/40', 'border-emerald-500');
+                        
+                        const badge = el.querySelector('.badge');
+                        badge.textContent = currentExpected;
+                        badge.classList.remove('opacity-0', 'bg-slate-900');
+                        badge.classList.add('opacity-100', 'bg-emerald-500', 'text-slate-900', 'font-bold');
+
+                        currentExpected++;
+                        if(currentExpected > 3) {
+                            setTimeout(() => showEduModal(5), 600);
+                        }
+                    } else {
+                        resetBugSequence();
+                    }
+                };
+            });
+        }
+
+        function renderEndGame() {
+            stageIndicator.classList.add('hidden');
+            progressBar.classList.add('from-emerald-400', 'to-cyan-400'); // make bar green
+            
+            stageContent.innerHTML = `
+                <div class="text-center animate-[float_3s_ease-in-out_infinite]">
+                    <div class="text-8xl mb-4">🏆</div>
+                    <h2 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-amber-500 mb-2">
+                        ภารกิจสำเร็จ!
+                    </h2>
+                    <p class="text-slate-200 mb-8 max-w-xs mx-auto">ยินดีด้วย! นักบินอวกาศได้ใช้ทักษะ <br><span class="text-emerald-400 font-bold">Computational Thinking</span><br>กู้ภัยได้สำเร็จ 100%</p>
+                    
+                    <button id="btn-restart" class="primary-btn w-full max-w-xs mx-auto py-3.5 rounded-xl font-bold text-lg shadow-[0_0_20px_rgba(99,102,241,0.5)]">
+                        🔄 เล่นใหม่อีกครั้ง
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('btn-restart').onclick = () => {
+                currentStage = 1;
+                progress = 0;
+                stageIndicator.classList.remove('hidden');
+                progressBar.classList.remove('from-emerald-400', 'to-cyan-400');
+                progressBar.style.width = '0%';
+                progressText.textContent = '0%';
+                renderStage();
+            };
+        }
+
+        // Add simple CSS animations manually for Tailwind arbitrary classes to work smoothly if needed
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        `;
+        document.head.appendChild(style);
+
+        // Start Game
+        window.onload = () => {
+            renderStage();
+        };
+    </script>
+</body>
+</html>
